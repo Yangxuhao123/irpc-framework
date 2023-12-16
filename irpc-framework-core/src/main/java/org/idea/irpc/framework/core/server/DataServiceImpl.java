@@ -1,6 +1,5 @@
 package org.idea.irpc.framework.core.server;
 
-import org.idea.irpc.framework.interfaces.DataService;
 
 import java.util.ArrayList;
 import java.util.List;

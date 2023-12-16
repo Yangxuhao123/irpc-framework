@@ -14,7 +14,7 @@ import org.idea.irpc.framework.core.common.RpcInvocation;
 import org.idea.irpc.framework.core.common.RpcProtocol;
 import org.idea.irpc.framework.core.common.config.ClientConfig;
 import org.idea.irpc.framework.core.proxy.jdk.JDKProxyFactory;
-import org.idea.irpc.framework.interfaces.DataService;
+import org.idea.irpc.framework.core.server.DataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
