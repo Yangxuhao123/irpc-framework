@@ -18,7 +18,7 @@ import org.idea.irpc.framework.core.proxy.jdk.JDKProxyFactory;
 import org.idea.irpc.framework.core.registy.URL;
 import org.idea.irpc.framework.core.registy.zookeeper.AbstractRegister;
 import org.idea.irpc.framework.core.registy.zookeeper.ZookeeperRegister;
-import org.idea.irpc.framework.interfaces.DataService;
+import org.idea.irpc.framework.core.server.DataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
