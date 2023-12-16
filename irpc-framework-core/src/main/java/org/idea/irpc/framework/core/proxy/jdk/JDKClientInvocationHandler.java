@@ -33,8 +33,14 @@ public class JDKClientInvocationHandler implements InvocationHandler {
         rpcInvocation.setTargetMethod(method.getName());
         rpcInvocation.setTargetServiceName(clazz.getName());
         rpcInvocation.setUuid(UUID.randomUUID().toString());
+        // client调用server 发送消息之前
+        // 会被这个代理对象 将消息封装成 rpcInvocation  存在本地缓存中
         RESP_MAP.put(rpcInvocation.getUuid(), OBJECT);
+        // 同时也将rpcInvocation 放入本地队列中
         SEND_QUEUE.add(rpcInvocation);
+        // ......
+        // 其实这中间 异步线程AsyncSendJob  发起rpc调用
+        // 服务端发送响应给client之后，客户端的channelHandler的channelRead方法会把数据放到 RESP_MAP 中
         long beginTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - beginTime < 3*1000) {
             Object object = RESP_MAP.get(rpcInvocation.getUuid());

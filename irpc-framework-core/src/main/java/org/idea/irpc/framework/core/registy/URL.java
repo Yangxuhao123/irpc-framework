@@ -13,7 +13,7 @@ import java.util.Map;
 public class URL {
 
     /**
-     * 服务应用名称
+     * 服务应用名称  irpc-provider
      */
     private String applicationName;
 

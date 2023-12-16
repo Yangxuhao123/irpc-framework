@@ -72,6 +72,8 @@ public class Client {
             }
         });
         iRpcListenerLoader = new IRpcListenerLoader();
+        // 初始化 zk节点update listener
+        // 这个listener会当server服务方地址发生变化时 及时更新client本地缓存
         iRpcListenerLoader.init();
         this.clientConfig = PropertiesBootstrap.loadClientConfigFromLocal();
         RpcReference rpcReference;
@@ -90,6 +92,7 @@ public class Client {
      */
     public void doSubscribeService(Class serviceBean) {
         if (abstractRegister == null) {
+            // 创建与zk通信的工具类
             abstractRegister = new ZookeeperRegister(clientConfig.getRegisterAddr());
         }
         URL url = new URL();
@@ -104,9 +107,11 @@ public class Client {
      */
     public void doConnectServer() {
         for (String providerServiceName : SUBSCRIBE_SERVICE_LIST) {
+            // 通过服务名找到zk上节点信息
             List<String> providerIps = abstractRegister.getProviderIps(providerServiceName);
             for (String providerIp : providerIps) {
                 try {
+                    // client与 zk节点中的存放的真实server端服务进行连接
                     ConnectionHandler.connect(providerServiceName, providerIp);
                 } catch (InterruptedException e) {
                     logger.error("[doConnectServer] connect fail ", e);
@@ -114,6 +119,7 @@ public class Client {
             }
             URL url = new URL();
             url.setServiceName(providerServiceName);
+            // zk开始监听server端服务信息的变化
             abstractRegister.doAfterSubscribe(url);
         }
     }
@@ -154,14 +160,22 @@ public class Client {
 
     public static void main(String[] args) throws Throwable {
         Client client = new Client();
+        // 下面两行代码的意思是: 获取代理对象，设置缓存信息，用于订阅时调用
         RpcReference rpcReference = client.initClientApplication();
         DataService dataService = rpcReference.get(DataService.class);
+        // 订阅某个服务,添加到本地缓存 SUBSCRIBE_SERVICE_LIST
         client.doSubscribeService(DataService.class);
         ConnectionHandler.setBootstrap(client.getBootstrap());
+        // 订阅服务，从SUBSCRIBE_SERVICE_LIST根据服务名获取 所需要的订阅的服务信息，添加注册中心的监听(zk节点监听)
+        // 根据服务生产者信息，建立连接ChannelFuture，建立的ChannelFuture放入CONNECT_MAP
         client.doConnectServer();
+        // 开启异步线程，发送函数请求，通过SEND_QUEUE进行通信
         client.startClient();
         for (int i = 0; i < 100; i++) {
             try {
+                // 被代理层invoke方法，增强功能(拦截),将请求放入队列SEND_QUEUE中
+                // 异步线程asyncSendJob 接收到 SEND_QUEUE数据，发起netty调用; 在invoke方法中 3*1000时间内”死循环获取“ RESP_MAP缓存中的响应数据
+                // 在clientHandler中响应数据放入到 RESP_MAP中
                 String result = dataService.sendData("test");
                 System.out.println(result);
                 Thread.sleep(1000);

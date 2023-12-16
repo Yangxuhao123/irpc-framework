@@ -66,6 +66,7 @@ public class Server {
                 ch.pipeline().addLast(new ServerHandler());
             }
         });
+        // 根据配置文件中的zk服务信息 进行实际注册
         this.batchExportUrl();
         bootstrap.bind(serverConfig.getServerPort()).sync();
     }
@@ -99,6 +100,7 @@ public class Server {
         url.setApplicationName(serverConfig.getApplicationName());
         url.addParameter("host", CommonUtils.getIpAddress());
         url.addParameter("port", String.valueOf(serverConfig.getServerPort()));
+        // 将我们希望注册到zk中的服务信息 添加到本地缓存
         PROVIDER_URL_SET.add(url);
     }
 
@@ -123,7 +125,9 @@ public class Server {
     public static void main(String[] args) throws InterruptedException {
         Server server = new Server();
         server.initServerConfig();
+        // 增加配置信息到本地缓存
         server.exportService(new DataServiceImpl());
+        // 根据配置文件中的zk服务信息 进行实际注册
         server.startApplication();
     }
 }

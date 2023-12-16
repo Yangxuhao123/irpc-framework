@@ -66,7 +66,7 @@ public class ServiceUpdateListener implements IRpcListener<IRpcUpdateEvent> {
                 }
             }
             finalChannelFutureWrappers.addAll(newChannelFutureWrapper);
-            //最终更新服务在这里
+            // 最终更新服务在这里
             CONNECT_MAP.put(urlChangeWrapper.getServiceName(),finalChannelFutureWrappers);
         }
     }

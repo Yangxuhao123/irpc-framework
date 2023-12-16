@@ -20,7 +20,7 @@ public class PropertiesLoader {
 
     private static Map<String, String> propertiesMap = new HashMap<>();
 
-    private static String DEFAULT_PROPERTIES_FILE = "/Users/linhao/IdeaProjects/my-github/irpc-framework/irpc-framework-core/src/main/resources/irpc.properties";
+    private static String DEFAULT_PROPERTIES_FILE = "D:\\studyCode\\irpc-framework\\irpc-framework-core\\src\\main\\resources\\irpc.properties";
 
     //todo 如果这里直接使用static修饰是否可以？
     public static void loadConfiguration() throws IOException {

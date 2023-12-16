@@ -52,7 +52,7 @@ public class ConnectionHandler {
         String[] providerAddress = providerIp.split(":");
         String ip = providerAddress[0];
         Integer port = Integer.parseInt(providerAddress[1]);
-        //到底这个channelFuture里面是什么
+        // 到底这个channelFuture里面是什么
         ChannelFuture channelFuture = bootstrap.connect(ip, port).sync();
         ChannelFutureWrapper channelFutureWrapper = new ChannelFutureWrapper();
         channelFutureWrapper.setChannelFuture(channelFuture);

@@ -24,6 +24,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         byte[] reqContent = rpcProtocol.getContent();
         String json = new String(reqContent,0,reqContent.length);
         RpcInvocation rpcInvocation = JSON.parseObject(json,RpcInvocation.class);
+        // 这里从本地缓存中获取key 判断从server端获取到的消息
+        // 是不是我发送消息出去的相应
         if(!RESP_MAP.containsKey(rpcInvocation.getUuid())){
             throw new IllegalArgumentException("server response is error!");
         }
