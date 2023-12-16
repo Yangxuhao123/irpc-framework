@@ -13,17 +13,17 @@ import static org.idea.irpc.framework.core.common.cache.CommonClientCache.*;
  * @Author linhao
  * @Date created in 8:30 下午 2022/1/5
  */
-public class RotateRouterImpl implements IRouter{
+public class RotateRouterImpl implements IRouter {
 
 
     @Override
     public void refreshRouterArr(Selector selector) {
         List<ChannelFutureWrapper> channelFutureWrappers = CONNECT_MAP.get(selector.getProviderServiceName());
         ChannelFutureWrapper[] arr = new ChannelFutureWrapper[channelFutureWrappers.size()];
-        for (int i=0;i<channelFutureWrappers.size();i++) {
-            arr[i]=channelFutureWrappers.get(i);
+        for (int i = 0; i < channelFutureWrappers.size(); i++) {
+            arr[i] = channelFutureWrappers.get(i);
         }
-        SERVICE_ROUTER_MAP.put(selector.getProviderServiceName(),arr);
+        SERVICE_ROUTER_MAP.put(selector.getProviderServiceName(), arr);
     }
 
     @Override
