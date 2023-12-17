@@ -29,7 +29,7 @@ import org.idea.irpc.framework.core.registy.URL;
 import org.idea.irpc.framework.core.registy.zookeeper.AbstractRegister;
 import org.idea.irpc.framework.core.router.IRouter;
 import org.idea.irpc.framework.core.serialize.SerializeFactory;
-import org.idea.irpc.framework.interfaces.DataService;
+import org.idea.irpc.framework.core.server.DataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

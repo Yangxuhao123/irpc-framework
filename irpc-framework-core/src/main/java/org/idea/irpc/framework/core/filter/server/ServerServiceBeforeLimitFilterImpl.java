@@ -27,11 +27,12 @@ public class ServerServiceBeforeLimitFilterImpl implements IServerFilter {
     public void doFilter(RpcInvocation rpcInvocation) {
         String serviceName = rpcInvocation.getTargetServiceName();
         ServerServiceSemaphoreWrapper serverServiceSemaphoreWrapper = SERVER_SERVICE_SEMAPHORE_MAP.get(serviceName);
-        //从缓存中提取semaphore对象
+        // 从缓存中提取semaphore对象
         Semaphore semaphore = serverServiceSemaphoreWrapper.getSemaphore();
         boolean tryResult = semaphore.tryAcquire();
         if (!tryResult) {
-            LOGGER.error("[ServerServiceBeforeLimitFilterImpl] {}'s max request is {},reject now", rpcInvocation.getTargetServiceName(), serverServiceSemaphoreWrapper.getMaxNums());
+            LOGGER.error("[ServerServiceBeforeLimitFilterImpl] {}'s max request is {},reject now",
+                    rpcInvocation.getTargetServiceName(), serverServiceSemaphoreWrapper.getMaxNums());
             MaxServiceLimitRequestException iRpcException = new MaxServiceLimitRequestException(rpcInvocation);
             rpcInvocation.setE(iRpcException);
             throw iRpcException;

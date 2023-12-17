@@ -47,11 +47,11 @@ public class MaxConnectionLimitHandler extends ChannelInboundHandlerAdapter {
             super.channelRead(ctx, msg);
         } else {
             numConnection.decrementAndGet();
-            //避免产生大量的time_wait连接
+            // 避免产生大量的time_wait连接
             channel.config().setOption(ChannelOption.SO_LINGER, 0);
             channel.unsafe().closeForcibly();
             numDroppedConnections.increment();
-            //这里加入一道cas可以减少一些并发请求的压力,定期地执行一些日志打印
+            // 这里加入一道cas可以减少一些并发请求的压力,定期地执行一些日志打印
             if (loggingScheduled.compareAndSet(false, true)) {
                 ctx.executor().schedule(this::writeNumDroppedConnectionLog,1, TimeUnit.SECONDS);
             }
@@ -64,8 +64,8 @@ public class MaxConnectionLimitHandler extends ChannelInboundHandlerAdapter {
     private void writeNumDroppedConnectionLog() {
         loggingScheduled.set(false);
         final long dropped = numDroppedConnections.sumThenReset();
-        if(dropped>0){
-            LOGGER.error("Dropped {} connection(s) to protect server,maxConnection is {}",dropped,maxConnectionNum);
+        if (dropped > 0) {
+            LOGGER.error("Dropped {} connection(s) to protect server,maxConnection is {}", dropped, maxConnectionNum);
         }
     }
 

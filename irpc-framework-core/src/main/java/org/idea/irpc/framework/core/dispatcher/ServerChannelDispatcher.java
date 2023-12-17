@@ -49,12 +49,12 @@ public class ServerChannelDispatcher {
                         public void run() {
                             RpcProtocol rpcProtocol = serverChannelReadData.getRpcProtocol();
                             RpcInvocation rpcInvocation = SERVER_SERIALIZE_FACTORY.deserialize(rpcProtocol.getContent(), RpcInvocation.class);
-                            //执行过滤链路
+                            // 执行过滤链路
                             try {
-                                //前置过滤器
+                                // 前置过滤器
                                 SERVER_BEFORE_FILTER_CHAIN.doFilter(rpcInvocation);
                             }catch (Exception cause){
-                                //针对自定义异常进行捕获，并且直接返回异常信息给到客户端，然后打印结果
+                                // 针对自定义异常进行捕获，并且直接返回异常信息给到客户端，然后打印结果
                                 if (cause instanceof IRpcException) {
                                     IRpcException rpcException = (IRpcException) cause;
                                     RpcInvocation reqParam = rpcException.getRpcInvocation();
@@ -68,7 +68,7 @@ public class ServerChannelDispatcher {
                             Object aimObject = PROVIDER_CLASS_MAP.get(rpcInvocation.getTargetServiceName());
                             Method[] methods = aimObject.getClass().getDeclaredMethods();
                             Object result = null;
-                            //业务函数实际执行位置
+                            // 业务函数实际执行位置
                             for (Method method : methods) {
                                 if (method.getName().equals(rpcInvocation.getTargetMethod())) {
                                     if (method.getReturnType().equals(Void.TYPE)) {
