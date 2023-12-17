@@ -90,7 +90,7 @@ public class Server {
             }
         });
         this.batchExportUrl();
-        //开始准备接收请求的任务
+        // 开始准备接收请求的任务
         SERVER_CHANNEL_DISPATCHER.startDataConsume();
         bootstrap.bind(serverConfig.getServerPort()).sync();
         IS_STARTED = true;
