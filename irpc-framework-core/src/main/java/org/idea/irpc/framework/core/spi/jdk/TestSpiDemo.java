@@ -16,6 +16,8 @@ public class TestSpiDemo {
     }
 
     public static void main(String[] args) {
+        // JDK内置提供的ServiceLoader会自动帮助我们去加载
+        // /META-INF/services/目录下边的文件，并且将其转换为具体实现类。
         ServiceLoader<ISpiTest> serviceLoader = ServiceLoader.load(ISpiTest.class);
         Iterator<ISpiTest> iSpiTestIterator = serviceLoader.iterator();
         while (iSpiTestIterator.hasNext()){

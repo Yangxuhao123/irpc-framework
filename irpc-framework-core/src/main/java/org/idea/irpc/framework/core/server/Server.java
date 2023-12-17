@@ -89,7 +89,6 @@ public class Server {
         if (serializeFactoryClass == null) {
             throw new RuntimeException("no match serialize type for " + serverSerialize);
         }
-
         SERVER_SERIALIZE_FACTORY = (SerializeFactory) serializeFactoryClass.newInstance();
         //过滤链技术初始化
         EXTENSION_LOADER.loadExtension(IServerFilter.class);
