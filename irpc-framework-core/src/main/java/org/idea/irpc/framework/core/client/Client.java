@@ -28,7 +28,7 @@ import org.idea.irpc.framework.core.serialize.fastjson.FastJsonSerializeFactory;
 import org.idea.irpc.framework.core.serialize.hessian.HessianSerializeFactory;
 import org.idea.irpc.framework.core.serialize.jdk.JdkSerializeFactory;
 import org.idea.irpc.framework.core.serialize.kryo.KryoSerializeFactory;
-import org.idea.irpc.framework.interfaces.DataService;
+import org.idea.irpc.framework.core.server.DataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

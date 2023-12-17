@@ -22,7 +22,10 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws InvocationTargetException, IllegalAccessException {
         RpcProtocol rpcProtocol = (RpcProtocol) msg;
         RpcInvocation rpcInvocation =SERVER_SERIALIZE_FACTORY.deserialize(rpcProtocol.getContent(),RpcInvocation.class);
-        //执行过滤链路
+        // 执行过滤链路
+        // 在 ChannelInboundHandlerAdapter
+        // 内部加入过滤链说明此事请求数据已经落入到了server端的业务线程池中(请求已经发过来了，要执行方法了，执行方法之前进行判断)
+        // 接下来需要通过责任链的每一个环节进行校对，最终确认是否可以执行目标函数。
         SERVER_FILTER_CHAIN.doFilter(rpcInvocation);
         Object aimObject = PROVIDER_CLASS_MAP.get(rpcInvocation.getTargetServiceName());
         Method[] methods = aimObject.getClass().getDeclaredMethods();

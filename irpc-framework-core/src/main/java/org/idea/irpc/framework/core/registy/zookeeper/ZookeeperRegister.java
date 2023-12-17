@@ -12,7 +12,6 @@ import org.idea.irpc.framework.core.common.event.IRpcUpdateEvent;
 import org.idea.irpc.framework.core.common.event.data.URLChangeWrapper;
 import org.idea.irpc.framework.core.registy.RegistryService;
 import org.idea.irpc.framework.core.registy.URL;
-import org.idea.irpc.framework.interfaces.DataService;
 
 import java.util.HashMap;
 import java.util.List;

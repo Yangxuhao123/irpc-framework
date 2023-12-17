@@ -120,10 +120,13 @@ public class ConnectionHandler {
         if (channelFutureWrappers == null || channelFutureWrappers.length == 0) {
             throw new RuntimeException("no provider exist for " + providerServiceName);
         }
+        // 这边将所有不符合要求的channelFutureWrapper都过滤了
+        // 客户端在获取到目标方的channel集合之后需要进行筛选过滤，最终才会发起真正的请求。
         CLIENT_FILTER_CHAIN.doFilter(Arrays.asList(channelFutureWrappers),rpcInvocation);
         Selector selector = new Selector();
         selector.setProviderServiceName(providerServiceName);
         selector.setChannelFutureWrappers(channelFutureWrappers);
+        // 从过滤得到可用的channelFutureWrappers中根据负载均衡算法进行选择
         ChannelFuture channelFuture = IROUTER.select(selector).getChannelFuture();
         return channelFuture;
     }
