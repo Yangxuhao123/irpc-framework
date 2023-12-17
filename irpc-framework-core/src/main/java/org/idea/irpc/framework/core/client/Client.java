@@ -24,7 +24,7 @@ import org.idea.irpc.framework.core.registy.URL;
 import org.idea.irpc.framework.core.registy.zookeeper.AbstractRegister;
 import org.idea.irpc.framework.core.router.IRouter;
 import org.idea.irpc.framework.core.serialize.SerializeFactory;
-import org.idea.irpc.framework.interfaces.DataService;
+import org.idea.irpc.framework.core.server.DataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -216,6 +216,7 @@ public class Client {
         rpcReferenceWrapper.setAimClass(DataService.class);
         rpcReferenceWrapper.setGroup("dev");
         rpcReferenceWrapper.setServiceToken("token-a");
+        rpcReferenceWrapper.setAsync(true);
 //        rpcReferenceWrapper.setUrl("192.168.43.227:9093");
         //在初始化之前必须要设置对应的上下文
         DataService dataService = rpcReference.get(rpcReferenceWrapper);

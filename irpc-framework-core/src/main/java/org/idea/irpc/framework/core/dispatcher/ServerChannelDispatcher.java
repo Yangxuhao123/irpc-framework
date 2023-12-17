@@ -36,7 +36,6 @@ public class ServerChannelDispatcher {
     }
 
     class ServerJobCoreHandle implements Runnable {
-
         @Override
         public void run() {
             while (true) {

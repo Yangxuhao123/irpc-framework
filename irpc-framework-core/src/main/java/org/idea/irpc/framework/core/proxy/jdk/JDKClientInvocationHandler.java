@@ -40,6 +40,7 @@ public class JDKClientInvocationHandler implements InvocationHandler {
         rpcInvocation.setUuid(UUID.randomUUID().toString());
         rpcInvocation.setAttachments(rpcReferenceWrapper.getAttatchments());
         SEND_QUEUE.add(rpcInvocation);
+        // 既然是一步请求，就没有必要再在RESP_MAP中判断是否有响应结果了
         if (rpcReferenceWrapper.isAsync()) {
             return null;
         }
