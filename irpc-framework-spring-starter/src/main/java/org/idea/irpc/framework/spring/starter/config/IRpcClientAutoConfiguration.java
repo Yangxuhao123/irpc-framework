@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
  * @Author linhao
  * @Date created in 5:53 下午 2022/3/8
  */
+// 负责在每个bean启动的时候，对bean里面凡是携带有IRpcReference注解的字段都修改其引用，使其指向对应的代理对象
 public class IRpcClientAutoConfiguration implements BeanPostProcessor, ApplicationListener<ApplicationReadyEvent> {
 
     private static RpcReference rpcReference = null;
@@ -39,6 +40,7 @@ public class IRpcClientAutoConfiguration implements BeanPostProcessor, Applicati
         for (Field field : fields) {
             if (field.isAnnotationPresent(IRpcReference.class)) {
                 if (!hasInitClientConfig) {
+                    // 初始化客户端的配置
                     client = new Client();
                     try {
                         rpcReference = client.initClientApplication();
@@ -59,7 +61,7 @@ public class IRpcClientAutoConfiguration implements BeanPostProcessor, Applicati
                     rpcReferenceWrapper.setServiceToken(iRpcReference.serviceToken());
                     rpcReferenceWrapper.setUrl(iRpcReference.url());
                     rpcReferenceWrapper.setTimeOut(iRpcReference.timeOut());
-                    //失败重试次数
+                    // 失败重试次数
                     rpcReferenceWrapper.setRetry(iRpcReference.retry());
                     rpcReferenceWrapper.setAsync(iRpcReference.async());
                     refObj = rpcReference.get(rpcReferenceWrapper);

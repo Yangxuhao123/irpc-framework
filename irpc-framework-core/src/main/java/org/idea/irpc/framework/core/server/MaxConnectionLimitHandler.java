@@ -36,6 +36,7 @@ public class MaxConnectionLimitHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        // 在server端的专门处理accept事件的channelHandler中加入业务逻辑 进行限流
         Channel channel = (Channel) msg;
         int conn = numConnection.incrementAndGet();
         if (conn > 0 && conn <= maxConnectionNum) {

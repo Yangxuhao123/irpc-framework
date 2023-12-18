@@ -20,6 +20,9 @@ import java.util.Map;
 @RequestMapping(value = "/api-test")
 public class ApiTestController {
 
+    // 在Spring容器启动多过程中，将这些个带有 @IRpcReference注解多字段进行构建，
+    // 让它们的句柄可以指向一个代理类（也就是我们前期代理层里生成的代理对象），
+    // 这样在使用UserService和OrderService类对应的方法时候就会感觉到似乎在执行本地调用一样
     @IRpcReference
     private UserRpcService userRpcService;
     @IRpcReference

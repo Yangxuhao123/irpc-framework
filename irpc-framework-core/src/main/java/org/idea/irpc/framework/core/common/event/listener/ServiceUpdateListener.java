@@ -34,7 +34,7 @@ public class ServiceUpdateListener implements IRpcListener<IRpcUpdateEvent> {
         List<ChannelFutureWrapper> finalChannelFutureWrappers = new ArrayList<>();
         for (ChannelFutureWrapper channelFutureWrapper : channelFutureWrappers) {
             String oldServerAddress = channelFutureWrapper.getHost() + ":" + channelFutureWrapper.getPort();
-            //如果老的url没有，说明已经被移除了
+            // 如果老的url没有，说明已经被移除了
             if (!matchProviderUrl.contains(oldServerAddress)) {
                 continue;
             } else {
@@ -42,10 +42,10 @@ public class ServiceUpdateListener implements IRpcListener<IRpcUpdateEvent> {
                 finalUrl.add(oldServerAddress);
             }
         }
-        //此时老的url已经被移除了，开始检查是否有新的url
+        // 此时老的url已经被移除了，开始检查是否有新的url
         List<ChannelFutureWrapper> newChannelFutureWrapper = new ArrayList<>();
         for (String newProviderUrl : matchProviderUrl) {
-            //新增的节点数据
+            // 新增的节点数据
             if (!finalUrl.contains(newProviderUrl)) {
                 ChannelFutureWrapper channelFutureWrapper = new ChannelFutureWrapper();
                 String host = newProviderUrl.split(":")[0];
@@ -69,10 +69,11 @@ public class ServiceUpdateListener implements IRpcListener<IRpcUpdateEvent> {
             }
         }
         finalChannelFutureWrappers.addAll(newChannelFutureWrapper);
-        //最终更新服务在这里
+        // 最终更新服务在这里
         CONNECT_MAP.put(urlChangeWrapper.getServiceName(), finalChannelFutureWrappers);
         Selector selector = new Selector();
         selector.setProviderServiceName(urlChangeWrapper.getServiceName());
+        // 更新路由层的服务信息
         IROUTER.refreshRouterArr(selector);
     }
 }

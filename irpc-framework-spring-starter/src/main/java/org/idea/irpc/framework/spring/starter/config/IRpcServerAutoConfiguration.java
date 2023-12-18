@@ -27,6 +27,7 @@ public class IRpcServerAutoConfiguration implements InitializingBean, Applicatio
     @Override
     public void afterPropertiesSet() throws Exception {
         Server server = null;
+        // 服务端的自动装配类会通过Spring上下文将带有@IRpcService注解的对象提取出来
         Map<String, Object> beanMap = applicationContext.getBeansWithAnnotation(IRpcService.class);
         if (beanMap.size() == 0) {
             //说明当前应用内部不需要对外暴露服务
@@ -38,6 +39,7 @@ public class IRpcServerAutoConfiguration implements InitializingBean, Applicatio
         server.initServerConfig();
         IRpcListenerLoader iRpcListenerLoader = new IRpcListenerLoader();
         iRpcListenerLoader.init();
+        // 调用IRPC框架内所提供的api进行服务暴露操作。
         for (String beanName : beanMap.keySet()) {
             Object bean = beanMap.get(beanName);
             IRpcService iRpcService = bean.getClass().getAnnotation(IRpcService.class);

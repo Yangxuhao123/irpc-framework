@@ -32,6 +32,7 @@ public class JDKClientInvocationHandler implements InvocationHandler {
     }
 
     @Override
+    // 客户端封装的代理对象执行方法的一系列操作(包括操作之前 之后 以及实际操作内容)
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         RpcInvocation rpcInvocation = new RpcInvocation();
         rpcInvocation.setArgs(args);
@@ -39,14 +40,19 @@ public class JDKClientInvocationHandler implements InvocationHandler {
         rpcInvocation.setTargetServiceName(rpcReferenceWrapper.getAimClass().getName());
         rpcInvocation.setUuid(UUID.randomUUID().toString());
         rpcInvocation.setAttachments(rpcReferenceWrapper.getAttatchments());
+        // 这是客户端发送前的操作
         SEND_QUEUE.add(rpcInvocation);
+        // 如果是异步的话 直接返回给客户端null
         if (rpcReferenceWrapper.isAsync()) {
             return null;
         }
         RESP_MAP.put(rpcInvocation.getUuid(), OBJECT);
         long beginTime = System.currentTimeMillis();
         int retryTimes = 0;
-        //判断是否出现了超时异常 或者 是否设置了重置次数
+        // 判断是否出现了超时异常 或者 是否设置了重置次数
+        // ......
+        // 其实这中间 异步线程AsyncSendJob  发起rpc调用
+        // 服务端发送响应给client之后，客户端的channelHandler的channelRead方法会把数据放到 RESP_MAP 中
         while (System.currentTimeMillis() - beginTime < timeOut || rpcInvocation.getRetry() > 0) {
             Object object = RESP_MAP.get(rpcInvocation.getUuid());
             if (object instanceof RpcInvocation) {
@@ -71,7 +77,7 @@ public class JDKClientInvocationHandler implements InvocationHandler {
                 }
             }
         }
-        //防止key一直存在于map集合中
+        // 得到了服务端的响应之后，就会移除消息的key，防止key一直存在于map集合中
         RESP_MAP.remove(rpcInvocation.getUuid());
         throw new TimeoutException("Wait for response from server on client " + timeOut + "ms,retry times is " + retryTimes + ",service's name is " + rpcInvocation.getTargetServiceName() + "#" + rpcInvocation.getTargetMethod());
     }

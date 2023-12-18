@@ -19,6 +19,7 @@ public class ServerServiceAfterLimitFilterImpl implements IServerFilter {
     public void doFilter(RpcInvocation rpcInvocation) {
         String serviceName = rpcInvocation.getTargetServiceName();
         ServerServiceSemaphoreWrapper serverServiceSemaphoreWrapper = SERVER_SERVICE_SEMAPHORE_MAP.get(serviceName);
+        // 在before过滤器中进行acquire
         serverServiceSemaphoreWrapper.getSemaphore().release();
     }
 }

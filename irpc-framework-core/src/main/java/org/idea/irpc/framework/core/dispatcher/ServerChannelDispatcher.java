@@ -28,18 +28,19 @@ public class ServerChannelDispatcher {
 
     public void init(int queueSize, int bizThreadNums) {
         RPC_DATA_QUEUE = new ArrayBlockingQueue<>(queueSize);
+        // the factory to use when the executor creates a new thread
+        // 这里的NamedThreadFactory就是为了记录当一个线程创建出来的名字
         executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
                 60L, TimeUnit.MILLISECONDS,
                 new SynchronousQueue<>(),  new NamedThreadFactory("irpc", true));
     }
 
     public void add(ServerChannelReadData serverChannelReadData) {
-        //这里面加入更细粒度的限流策略
+        // 这里面加入更细粒度的限流策略
         RPC_DATA_QUEUE.add(serverChannelReadData);
     }
 
     class ServerJobCoreHandle implements Runnable {
-
         @Override
         public void run() {
             while (true) {
@@ -50,7 +51,7 @@ public class ServerChannelDispatcher {
                         public void run() {
                             RpcProtocol rpcProtocol = serverChannelReadData.getRpcProtocol();
                             RpcInvocation rpcInvocation = SERVER_SERIALIZE_FACTORY.deserialize(rpcProtocol.getContent(), RpcInvocation.class);
-                            //执行过滤链路
+                            // 在server端执行真正的target方法之前，需要执行过滤链路
                             try {
                                 //前置过滤器
                                 SERVER_BEFORE_FILTER_CHAIN.doFilter(rpcInvocation);
@@ -69,7 +70,7 @@ public class ServerChannelDispatcher {
                             Object aimObject = PROVIDER_CLASS_MAP.get(rpcInvocation.getTargetServiceName());
                             Method[] methods = aimObject.getClass().getDeclaredMethods();
                             Object result = null;
-                            //业务函数实际执行位置
+                            // 业务函数实际执行位置
                             for (Method method : methods) {
                                 if (method.getName().equals(rpcInvocation.getTargetMethod())) {
                                     if (method.getReturnType().equals(Void.TYPE)) {
@@ -91,7 +92,7 @@ public class ServerChannelDispatcher {
                                 }
                             }
                             rpcInvocation.setResponse(result);
-                            //后置过滤器
+                            // 后置过滤器
                             SERVER_AFTER_FILTER_CHAIN.doFilter(rpcInvocation);
                             RpcProtocol respRpcProtocol = new RpcProtocol(SERVER_SERIALIZE_FACTORY.serialize(rpcInvocation));
                             serverChannelReadData.getChannelHandlerContext().writeAndFlush(respRpcProtocol);
@@ -108,6 +109,4 @@ public class ServerChannelDispatcher {
         Thread thread = new Thread(new ServerJobCoreHandle());
         thread.start();
     }
-
-
 }

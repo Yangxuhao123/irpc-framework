@@ -28,9 +28,11 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        // 将server端收到的信息封装成了对象
         ServerChannelReadData serverChannelReadData = new ServerChannelReadData();
         serverChannelReadData.setRpcProtocol((RpcProtocol) msg);
         serverChannelReadData.setChannelHandlerContext(ctx);
+        // 将封装好的对象交给dispatcher进行处理
         SERVER_CHANNEL_DISPATCHER.add(serverChannelReadData);
     }
 

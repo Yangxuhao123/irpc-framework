@@ -69,7 +69,7 @@ public class ConnectionHandler {
             channelFutureWrappers = new ArrayList<>();
         }
         channelFutureWrappers.add(channelFutureWrapper);
-        //例如com.sise.test.UserService会被放入到一个Map集合中，key是服务的名字，value是对应的channel通道的List集合
+        // 例如com.sise.test.UserService会被放入到一个Map集合中，key是服务的名字，value是对应的channel通道的List集合
         CONNECT_MAP.put(providerServiceName, channelFutureWrappers);
         Selector selector = new Selector();
         selector.setProviderServiceName(providerServiceName);
@@ -123,7 +123,7 @@ public class ConnectionHandler {
             rpcInvocation.setRetry(0);
             rpcInvocation.setE(new RuntimeException("no provider exist for " + providerServiceName));
             rpcInvocation.setResponse(null);
-            //直接交给响应线程那边处理（响应线程在代理类内部的invoke函数中，那边会取出对应的uuid的值，然后判断）
+            // 直接交给响应线程那边处理（响应线程在代理类内部的invoke函数中，那边会取出对应的uuid的值，然后判断）
             RESP_MAP.put(rpcInvocation.getUuid(),rpcInvocation);
             Log.error("channelFutureWrapper is null");
             return null;
@@ -132,8 +132,8 @@ public class ConnectionHandler {
         for (int i = 0; i < channelFutureWrappers.length; i++) {
             channelFutureWrappersList.add(channelFutureWrappers[i]);
         }
-        //在客户端会做分组的过滤操作
-        //这里不能用Arrays.asList 因为它所生成的list是一个不可修改的list
+        // 在客户端会做分组的过滤操作
+        // 这里不能用Arrays.asList 因为它所生成的list是一个不可修改的list
         CLIENT_FILTER_CHAIN.doFilter(channelFutureWrappersList, rpcInvocation);
         Selector selector = new Selector();
         selector.setProviderServiceName(providerServiceName);

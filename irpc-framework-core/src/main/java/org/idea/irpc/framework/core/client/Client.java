@@ -84,11 +84,14 @@ public class Client {
                 ch.pipeline().addLast(new ClientHandler());
             }
         });
+        // 监听zk节点上服务的变化
         iRpcListenerLoader = new IRpcListenerLoader();
+        // 初始化 zk节点update listener
+        // 这个listener会当server服务方地址发生变化时 及时更新client本地缓存
         iRpcListenerLoader.init();
         this.clientConfig = PropertiesBootstrap.loadClientConfigFromLocal();
         CLIENT_CONFIG = this.clientConfig;
-        //spi扩展的加载部分
+        // spi扩展的加载部分
         this.initClientConfig();
         EXTENSION_LOADER.loadExtension(ProxyFactory.class);
         String proxyType = clientConfig.getProxyType();
@@ -109,6 +112,7 @@ public class Client {
                 EXTENSION_LOADER.loadExtension(RegistryService.class);
                 Map<String, Class> registerMap = EXTENSION_LOADER_CLASS_CACHE.get(RegistryService.class.getName());
                 Class registerClass = registerMap.get(clientConfig.getRegisterType());
+                // 创建与zk通信的工具类
                 ABSTRACT_REGISTER = (AbstractRegister) registerClass.newInstance();
             } catch (Exception e) {
                 throw new RuntimeException("registryServiceType unKnow,error is ", e);
@@ -128,9 +132,11 @@ public class Client {
      */
     public void doConnectServer() {
         for (URL providerURL : SUBSCRIBE_SERVICE_LIST) {
+            // 通过服务名找到zk上节点信息
             List<String> providerIps = ABSTRACT_REGISTER.getProviderIps(providerURL.getServiceName());
             for (String providerIp : providerIps) {
                 try {
+                    // client与 zk节点中的存放的真实server端服务进行连接
                     ConnectionHandler.connect(providerURL.getServiceName(), providerIp);
                 } catch (InterruptedException e) {
                     logger.error("[doConnectServer] connect fail ", e);
@@ -139,6 +145,7 @@ public class Client {
             URL url = new URL();
             url.addParameter("servicePath", providerURL.getServiceName() + "/provider");
             url.addParameter("providerIps", JSON.toJSONString(providerIps));
+            // zk开始监听server端服务信息的变化
             ABSTRACT_REGISTER.doAfterSubscribe(url);
         }
     }
@@ -167,10 +174,11 @@ public class Client {
                 try {
                     //阻塞模式
                     RpcInvocation rpcInvocation = SEND_QUEUE.take();
+                    // 经过过滤器链 和 负载策略选择合适的channelFuture
                     ChannelFuture channelFuture = ConnectionHandler.getChannelFuture(rpcInvocation);
                     if (channelFuture != null) {
                         Channel channel = channelFuture.channel();
-                        //如果出现服务端中断的情况需要兼容下
+                        // 如果出现服务端中断的情况需要兼容下
                         if (!channel.isOpen()) {
                             throw new RuntimeException("aim channel is not open!rpcInvocation is " + rpcInvocation);
                         }
@@ -225,6 +233,7 @@ public class Client {
 
     public static void main(String[] args) throws Throwable {
         Client client = new Client();
+        // 获取代理对象，设置缓存信息，用于订阅时调用
         RpcReference rpcReference = client.initClientApplication();
         RpcReferenceWrapper<DataService> rpcReferenceWrapper = new RpcReferenceWrapper<>();
         rpcReferenceWrapper.setAimClass(DataService.class);
@@ -233,12 +242,19 @@ public class Client {
 //        rpcReferenceWrapper.setUrl("192.168.43.227:9093");
         //在初始化之前必须要设置对应的上下文
         DataService dataService = rpcReference.get(rpcReferenceWrapper);
+        // // 订阅某个服务,添加到本地缓存 SUBSCRIBE_SERVICE_LIST
         client.doSubscribeService(DataService.class);
         ConnectionHandler.setBootstrap(client.getBootstrap());
+        // 订阅服务，从SUBSCRIBE_SERVICE_LIST根据服务名获取 所需要的订阅的服务信息，添加注册中心的监听(zk节点监听)
+        // 根据服务生产者信息，建立连接ChannelFuture，建立的ChannelFuture放入CONNECT_MAP
         client.doConnectServer();
+        // 开启异步线程，发送函数请求，通过SEND_QUEUE进行通信
         client.startClient();
         for (int i = 0; i < 10000; i++) {
             try {
+                // 被代理层invoke方法，增强功能(拦截),将请求放入队列SEND_QUEUE中
+                // 异步线程asyncSendJob 接收到 SEND_QUEUE数据，发起netty调用; 在invoke方法中 3*1000时间内”死循环获取“ RESP_MAP缓存中的响应数据
+                // 在clientHandler中响应数据放入到 RESP_MAP中
                 String result = dataService.sendData("test");
                 System.out.println(result);
                 Thread.sleep(1000);

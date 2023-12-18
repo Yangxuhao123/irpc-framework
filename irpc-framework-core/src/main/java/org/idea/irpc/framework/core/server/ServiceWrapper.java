@@ -28,7 +28,6 @@ public class ServiceWrapper {
      */
     private Integer limit = 10;
 
-
     public ServiceWrapper(Object serviceObj) {
         this.serviceObj = serviceObj;
     }

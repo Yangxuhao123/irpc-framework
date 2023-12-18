@@ -33,7 +33,7 @@ public class ServerTokenFilterImpl implements IServerFilter {
             rpcInvocation.setRetry(0);
             rpcInvocation.setE(new RuntimeException("service token is illegal for service " + rpcInvocation.getTargetServiceName()));
             rpcInvocation.setResponse(null);
-            //直接交给响应线程那边处理（响应线程在代理类内部的invoke函数中，那边会取出对应的uuid的值，然后判断）
+            // 直接交给响应线程那边处理（响应线程在代理类内部的invoke函数中，那边会取出对应的uuid的值，然后判断）
             RESP_MAP.put(rpcInvocation.getUuid(), rpcInvocation);
             throw new IRpcException(rpcInvocation);
         }
